@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require 'uri'
+
 class Feed < Sequel::Model
   set_schema do
     primary_key :id
@@ -8,12 +10,24 @@ class Feed < Sequel::Model
     time :modified_at
   end
 
+  def name
+    self.uri
+  end
+
+  def favicon_uri
+    "http://favicon.hatena.ne.jp/?url=" + URI.encode(self.uri)
+  end
+
   def before_create
     self.created_at = Time.now
   end
 
   def before_save
     self.modified_at = Time.now
+  end
+
+  def before_destroy
+    self.remove_all_groups
   end
 
   many_to_many :groups
@@ -38,11 +52,16 @@ class Group < Sequel::Model
     self.modified_at = Time.now
   end
 
+  def before_destroy
+    self.remove_all_feeds
+  end
+
   create_table unless table_exists?
 end
 
 unless DB.table_exists?(:feeds_groups)
   DB.create_table :feeds_groups do
+    primary_key :id
     foreign_key :feed_id, :table => :feeds
     foreign_key :group_id, :table => :groups
   end

@@ -1,1 +1,6 @@
-nice!!!
+<h2>グループ</h2>
+<ul>
+  <?r @groups.each do |group| ?>
+  <li>#{ anchor(group.name, GroupController.r(group.name)) }</li>
+  <?r end ?>
+</ul>

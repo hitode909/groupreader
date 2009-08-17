@@ -1,3 +1,8 @@
+#{render_view(:feed_list_script, {:feeds => @group.feeds} )}
 <pre>#{@group.description || "説明はありません"}</pre>
-<h2>フィード一覧</h2>
-#{render_view(:feed_list)}
+#{render_view(:feed_list, {:feeds => @group.feeds} )}
+
+<form method="POST" action="#{@group.name}.subscribe">
+  <input name="feed_uri" type="text" size="80"></input>
+  <input type="submit" value="追加"></input>
+</form>

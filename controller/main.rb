@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# Default url mappings are:
-#  a controller called Main is mapped on the root of the site: /
-#  a controller called Something is mapped on: /something
-# If you want to override this, add a line like this inside the class
-#  map '/otherurl'
-# this will force the controller to be mounted on: /otherurl
+
+require 'kconv'
+require 'json'
+require 'open-uri'
+require 'nokogiri'
 
 class MainController < Controller
   # the index action is called automatically when no other action is specified
   def index
     @title = "Welcome!!"
+    @groups = Group.all
   end
 
 end
@@ -18,13 +18,8 @@ class GroupController < Controller
   map '/group'
 
   def index(group_name)
-    redirect MainController.r(:index) unless group_name
-
-    if request.post?
-      group = Group.find_or_create(:name => group_name)
-      redirect GroupController.r(:index, group_name)
-    elsif request.get?
-      @group = Group.find([:name => group_name])
+    @group = Group.find(:name => group_name)
+    if group_name
       @group_name = group_name
       if @group
         @title = "グループ - " + @group.name
@@ -34,9 +29,76 @@ class GroupController < Controller
       end
     end
   end
+
+  def create(group_name)
+    # raise unless request.post?
+    group = Group.create(:name => group_name)
+    group.description = request[:description] if request[:description]
+    group.save
+  ensure
+    redirect GroupController.r(group_name)
+  end
+
+  def delete(group_name)
+    # raise unless request.post?
+    group = Group.find(:name => group_name)
+    raise unless group
+    group.destroy
+  ensure
+    redirect MainController.r
+  end
+
+  def subscribe(group_name)
+#     return unless group_name
+#     return unless request.post?
+    feed_uri = url_decode request[:feed_uri]
+    feed = Feed.find_or_create(:uri => feed_uri)
+    feed.save
+    group = Group.find(:name => group_name)
+    if feed and group.feeds_dataset.filter(:uri => feed_uri).count == 0
+      group.add_feed(feed) if feed
+    end
+  ensure
+    redirect GroupController.r(group_name)
+  end
+
+  def error(group_name)
+    respond('', 403)
+  end
 end
 
 class FeedController < Controller
-  def index
+  map '/feed'
+  provide(:json, :type => 'application/json'){|a,s| s.to_json }
+
+
+  def index(feed_uri)
+    @feed = Feed.find(:uri => url_decode(feed_uri))
+    if @feed
+      @title = @feed.name
+      render_view(:index_has_feed)
+    else
+      respond('', 404)
+    end
+  end
+
+  def get
+    feed_uri = request[:uri]
+    feed = Feed.find(:uri => url_decode(feed_uri))
+    respond('', 404) unless feed
+    result = { };
+    xml = Nokogiri(open(feed.uri).read.toutf8)
+    result['title'] = xml.search('channel title').first.text
+    result['link'] = xml.search('channel link').first.text
+    # result['dc:creator'] = xml.search('channel dc:creator').first.text
+    result['entries'] = xml.search('channel item').map do |section|
+      {
+        'title' => section.search('title').text,
+        'pubDate' => section.search('pubDate').text,
+        'creator' => section.search('creator').text,
+        'description' => section.search('description').text,
+      }
+    end
+    @result = result
   end
 end
