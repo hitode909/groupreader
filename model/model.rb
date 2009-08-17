@@ -3,7 +3,6 @@ class Feed < Sequel::Model
   set_schema do
     primary_key :id
     String :uri, :unique => true, :null => false
-    String :description
     Boolean :valid, :default => true
     time :created_at
     time :modified_at
@@ -25,6 +24,7 @@ class Group < Sequel::Model
   set_schema do
     primary_key :id
     String :name, :unique => true, :null => false
+    String :description
     time :created_at
     time :modified_at
   end
