@@ -1,10 +1,6 @@
 <div class="feed-list">
 <?r if @feeds and @feeds.length ?>
-<?r @feeds.each do |feed| ?>
-<span>
-<a href="#{h FeedController.r(url_encode(feed.uri)) }" title="#{h feed.name}" alt="#{h feed.name}"><img src="#{h feed.favicon_uri}"></a>
-</span>
-<?r end ?>
+<?r @feeds.each do |feed| ?><span><a href="#{h FeedController.r(url_encode(feed.uri)) }" title="#{h feed.name}" alt="#{h feed.name}"><img src="#{h feed.favicon_uri}"></a></span><?r end ?>
 <?r else ?>
 フィードはありません
 <?r end ?>

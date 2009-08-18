@@ -5,11 +5,13 @@
   }
 </script>
 <script type="text/javascript" src="/js/reader.js"></script>
-<pre>#{@group.description || "説明はありません"}</pre>
-#{render_view(:feed_list, {:feeds => @group.feeds} )}
+<div class="navigation-top">
+  <pre>#{@group.description || "説明はありません"}</pre>
+  #{render_view(:feed_list, {:feeds => @group.feeds} )}
 
-<form method="POST" action="/group/#{@group.name}/subscribe">
-  <input name="feed_uri" type="text" size="80"></input>
-  <input type="submit" value="追加"></input>
-</form>
+  <form method="POST" action="/group/#{@group.name}/subscribe">
+    <input name="feed_uri" type="text" size="80"></input>
+    <input type="submit" value="追加"></input>
+  </form>
+</div>
 <div class="items"></div>

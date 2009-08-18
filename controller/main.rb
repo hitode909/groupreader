@@ -19,7 +19,7 @@ class GroupController < Controller
     if group_name
       @group_name = group_name
       if @group
-        @title = "グループ - " + @group.name
+        @title = 'group/' + @group.name
         render_view(:index_hasgroup)
       else
         render_view(:index_nogroup)
