@@ -61,6 +61,13 @@ class Feed < Sequel::Model
     e
   end
 
+  def to_hash
+    { :name    => self.name,
+      :uri     => self.uri,
+      :favicon => self.favicon_uri
+    }
+  end
+
   def before_create
     self.created_at = Time.now
   end

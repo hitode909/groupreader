@@ -8,11 +8,11 @@ class MainController < Controller
     @title = "Welcome!!"
     @groups = Group.all
   end
-
 end
 
 class GroupController < Controller
   map '/group'
+  provide(:json, :type => 'application/json'){|a,s| s.to_json }
 
   def index(group_name)
     @group = Group.find(:name => group_name)
@@ -43,6 +43,11 @@ class GroupController < Controller
     group.destroy
   ensure
     redirect MainController.r
+  end
+
+  def feeds(group_name)
+    group = Group.find(:name => group_name)
+    group.feeds.map{|f| f.to_hash}
   end
 
   def subscribe(group_name)
@@ -82,7 +87,7 @@ class FeedController < Controller
   def get
     feed_uri = request[:uri]
     json = Feed.json(url_decode(feed_uri))
-   rescue e
+  rescue e
     respond(e.to_s, 403)
-   end
+  end
 end

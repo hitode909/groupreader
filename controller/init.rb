@@ -7,7 +7,9 @@ end
 require 'controller/main'
 
 Innate::Route['group_entity'] = lambda{ |path, request|
-  if path =~ %r|^/group/([^/.]+)\.([^/.]+)$|
-    "/group/#{$2}/#{$1}"
-  end
+   if path =~ %r|^/group/([^/.]+)\/([^/.]+)$|
+     "/group/#{$2}/#{$1}"
+   elsif path =~ %r|^/group/([^/.]+)\/([^/.]+)\.([^/.]+)$|
+     "/group/#{$2}/#{$1}.#{$3}"
+   end
 }

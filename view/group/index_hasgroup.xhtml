@@ -1,8 +1,15 @@
-#{render_view(:feed_list_script, {:feeds => @group.feeds} )}
+<script type="text/javascript">
+  if (typeof(Feeds) == "undefined") {
+    Feeds = {};
+    Feeds.group = "#{@group.name}";
+  }
+</script>
+<script type="text/javascript" src="/js/reader.js"></script>
 <pre>#{@group.description || "説明はありません"}</pre>
 #{render_view(:feed_list, {:feeds => @group.feeds} )}
 
-<form method="POST" action="#{@group.name}.subscribe">
+<form method="POST" action="/group/#{@group.name}/subscribe">
   <input name="feed_uri" type="text" size="80"></input>
   <input type="submit" value="追加"></input>
 </form>
+<div class="reader"></div>
