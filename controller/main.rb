@@ -18,8 +18,8 @@ class GroupController < Controller
     @group = Group.find(:name => group_name)
     if group_name
       @group_name = group_name
+      @title = 'group/' + @group_name
       if @group
-        @title = 'group/' + @group.name
         render_view(:index_hasgroup)
       else
         render_view(:index_nogroup)
