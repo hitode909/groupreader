@@ -82,7 +82,7 @@ class FeedController < Controller
   def get
     feed_uri = request[:uri]
     json = Feed.json(url_decode(feed_uri))
-  rescue
+   rescue e
     respond(e.to_s, 403)
    end
 end

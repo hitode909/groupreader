@@ -3,7 +3,7 @@ require 'uri'
 require 'kconv'
 require 'open-uri'
 require 'rss'
-
+require 'time'
 
 class Feed < Sequel::Model
   set_schema do
@@ -35,9 +35,9 @@ class Feed < Sequel::Model
     result['items'] = rss.items.map do |item|
       {
         'title' => item.title,
-        'pubDate' => (item.dc_date or item.pubDate),
+        'pubDate' => (item.dc_date || item.pubDate).rfc822,
         'creator' => item.dc_creator,
-        'description' => (item.content_encoded or item.description),
+        'description' => (item.content_encoded || item.description),
         'link' => item.link,
       }
     end
