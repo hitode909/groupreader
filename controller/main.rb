@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-require 'kconv'
 require 'json'
-require 'open-uri'
-require 'nokogiri'
 
 class MainController < Controller
   # the index action is called automatically when no other action is specified
@@ -84,21 +81,8 @@ class FeedController < Controller
 
   def get
     feed_uri = request[:uri]
-    feed = Feed.find(:uri => url_decode(feed_uri))
-    respond('', 404) unless feed
-    result = { };
-    xml = Nokogiri(open(feed.uri).read.toutf8)
-    result['title'] = xml.search('channel title').first.text
-    result['link'] = xml.search('channel link').first.text
-    # result['dc:creator'] = xml.search('channel dc:creator').first.text
-    result['entries'] = xml.search('channel item').map do |section|
-      {
-        'title' => section.search('title').text,
-        'pubDate' => section.search('pubDate').text,
-        'creator' => section.search('creator').text,
-        'description' => section.search('description').text,
-      }
-    end
-    @result = result
-  end
+    json = Feed.json(url_decode(feed_uri))
+  rescue
+    respond(e.to_s, 403)
+   end
 end
