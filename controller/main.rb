@@ -64,6 +64,17 @@ class GroupController < Controller
     redirect GroupController.r(group_name)
   end
 
+  def unsubscribe(group_name)
+    feed_uri = url_decode request[:feed_uri]
+    feed = Feed.find(:uri => feed_uri)
+    group = Group.find(:name => group_name)
+    if feed and group.feeds_dataset.filter(:uri => feed_uri).count == 1
+      group.remove_feed(feed)
+    end
+  ensure
+    redirect GroupController.r(group_name)
+  end
+
   def error(group_name)
     respond('', 403)
   end
