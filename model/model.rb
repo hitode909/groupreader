@@ -98,7 +98,6 @@ class Group < Sequel::Model
   set_schema do
     primary_key :id
     String :name, :unique => true, :null => false
-    String :description
     time :created_at
     time :modified_at
   end

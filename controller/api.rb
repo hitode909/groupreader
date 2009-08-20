@@ -12,7 +12,6 @@ module Api
       name = request[:name]
       respond('The group already exist.', 409) if Group.find(:name => name)
       group = Group.create(:name => name)
-      group.description = request[:description] if request[:description]
       group.save.to_hash
     end
 
@@ -21,7 +20,6 @@ module Api
       name = request[:name]
       group = Group.find(:name => name)
       respond('The group not found', 404) unless group
-      group.description = request[:description] if request[:description]
       group.destroy
       'ok'
     end
