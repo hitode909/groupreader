@@ -38,6 +38,11 @@ a img {
   padding: 10px;
 }
 
+.navigation-top .feed-item {
+    display: inline;
+    padding-right: 16px;
+}
+
 .newfeed {
   text-decoration: underline;
   cursor: pointer;

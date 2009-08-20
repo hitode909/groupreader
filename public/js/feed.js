@@ -18,7 +18,24 @@
                 var a = $("<a>").attr("href", feed.link || feed.uri);
                 a.append($("<span>").addClass("favicon").append($(["<img src='", feed.favicon, "' title='", feed.name, "' alt='", feed.name, "'>"].join(""))));
                 a.append($("<span>").addClass("title").text(feed.name));
+                var removeButton = $("<span>").addClass("delete-button").text("[x]");
+                removeButton.click(function(){
+                    if (!confirm(feed.name + " unsubscribe?")) return;
+
+                    elem.append(loadingElement());
+                    $.post('/api/group/unsubscribe',
+                           { feed_uri: feed.uri,
+                             name: GroupReader.group
+                           },
+                           function(data){
+                               $.each(elem.data("items"), function(){this.remove();});
+                               elem.remove();
+                           },
+                           'json'
+                          );
+                });
                 elem.append(a);
+                elem.append(removeButton);
                 elem.data("items", []);
                 elem.data("feed", feed);
                 return elem;
