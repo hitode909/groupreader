@@ -11,7 +11,6 @@ class MainController < Controller
 end
 
 class GroupController < Controller
-  map '/group'
   provide(:json, :type => 'application/json'){|a,s| s.to_json }
 
   def index(group_name)
@@ -81,7 +80,6 @@ class GroupController < Controller
 end
 
 class FeedController < Controller
-  map '/feed'
   provide(:json, :type => 'application/json'){|a,s| s.to_json }
 
 
