@@ -33,7 +33,7 @@ module Api
       if group and not group.feeds_dataset[:uri => feed_uri]
         group.add_feed(feed)
       end
-      group.to_hash
+      feed.to_hash
     end
 
     def unsubscribe
