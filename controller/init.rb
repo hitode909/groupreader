@@ -13,3 +13,7 @@ Innate::Route['group_entity'] = lambda{ |path, request|
      "/group/#{$2}/#{$1}.#{$3}"
    end
 }
+
+class JsonController < Controller
+  provide(:html, :type => 'application/json'){|a,s| s.to_json }
+end

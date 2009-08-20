@@ -11,8 +11,6 @@ class MainController < Controller
 end
 
 class GroupController < Controller
-  provide(:json, :type => 'application/json'){|a,s| s.to_json }
-
   def index(group_name)
     @group = Group.find(:name => group_name)
     if group_name
@@ -80,9 +78,6 @@ class GroupController < Controller
 end
 
 class FeedController < Controller
-  provide(:json, :type => 'application/json'){|a,s| s.to_json }
-
-
   def index(feed_uri)
     @feed = Feed.find(:uri => url_decode(feed_uri))
     if @feed
@@ -99,4 +94,7 @@ class FeedController < Controller
   rescue e
     respond(e.to_s, 403)
   end
+end
+
+class ApiController < JsonController
 end
