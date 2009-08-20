@@ -31,7 +31,10 @@ a img {
 }
 
 .navigation-top {
-  background: #aaf;
+  border-color:#666;
+  border-style:solid;
+  border-width: 1px 0 1px;
+  background: #fff;
   padding: 10px;
 }
 
