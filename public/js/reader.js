@@ -35,9 +35,10 @@ $(document).ready(
                     did = true;
                     return false;
                 }
+                return true;
             });
             if (!did) $('div.items').append(item);
-        }
+        };
 
         feedIcon = function(feed) {
             var parent = $('.feed-list');
@@ -45,7 +46,7 @@ $(document).ready(
                 ['<span class="feed"><img src="', feed.favicon, '"><span class="feed-name">',feed.name,'</span></span>'].join('')
             );
             parent.append(element);
-        }
+        };
         
         var uri = ["/group", GroupReader.group, "feeds.json"].join("/");
         $.getJSON(uri, {}, function(data) {
