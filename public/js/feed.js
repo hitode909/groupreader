@@ -23,13 +23,13 @@
                 elem.data("feed", feed);
                 return elem;
             };
-            
+
             var loadingElement = function() {
                 var elem = $("<span>").addClass("loading-icon");
                 elem.append("<img src='/image/ajax.gif'");
                 return elem;
             };
-            
+
             var elem = feedElement(feed);
             elem.append(loadingElement());
             feedTarget.append(elem);
@@ -44,10 +44,11 @@
                 }
 
                 $(data.items).each(function() {
-                    elem.data("items").push($.newitem(feed, this));
+                    var item = this;
+                    elem.data("items").push($.newitem(feed, item));
                 });
             });
-            
+
             return this;
         },
 
@@ -74,7 +75,7 @@
                 if (item.pubDate) footerMenu.append($("<li>").text('at ' + new Date(item.pubDate).toLocaleFormat('%Y-%m-%d %H:%M')));
                 if (item.creator) footerMenu.append($("<li>").text('by ' + item.creator));
                 footer.append(footerMenu);
-                
+
                 element.append(header);
                 element.append(footer);
                 if (body) element.append(body);
