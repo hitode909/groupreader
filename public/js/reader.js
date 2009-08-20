@@ -2,7 +2,7 @@ $(document).ready(
     function(){
         var itemElement = function(feed, item) {
             var element = $("<div>").addClass("item");
-            if (item.pubDate) element.attr('id', Date.parse(item.pubDate));
+            if (item.pubDate) element.data('date', Date.parse(item.pubDate));
             var header = $("<div>").addClass("item-header");
             header.append($(['<a href="', item.link, '">', item.title, '</a>'].join('')));
 
@@ -28,9 +28,9 @@ $(document).ready(
 
         var appendItem = function(item) {
             var did = false;
-            var newId = item.attr('id');
+            var newId = item.data('date');
             $("div.item").each(function() {
-                if (this.id < newId) {
+                if ($(this).data('date') < newId) {
                     $(this).before(item);
                     did = true;
                     return false;
