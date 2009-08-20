@@ -48,12 +48,11 @@ $(document).ready(
             parent.append(element);
         };
         
-        var uri = ["/group", GroupReader.group, "feeds.json"].join("/");
-        $.getJSON(uri, {}, function(data) {
-            $(data).each(function(){
+        $.getJSON('/api/group', {name: GroupReader.group}, function(data) {
+            $(data.feeds).each(function(){
                 var feed = this;
                 feedIcon(this);
-                $.getJSON("/feed/get.json", {uri: this.uri}, function(data) {
+                $.getJSON("/api/feed/get", {uri: this.uri}, function(data) {
                     $(data.items).each(function(){
                         appendItem(itemElement(feed, this));
                     });
