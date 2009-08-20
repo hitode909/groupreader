@@ -8,7 +8,7 @@ module Api
     end
 
     def create
-#      return unless request.post?
+      return unless request.post?
       name = request[:name]
       respond('The group already exist.', 409) if Group.find(:name => name)
       group = Group.create(:name => name)
@@ -16,7 +16,7 @@ module Api
     end
 
     def delete
-      #      return unless request.post?
+      return unless request.post?
       name = request[:name]
       group = Group.find(:name => name)
       respond('The group not found', 404) unless group
@@ -25,7 +25,7 @@ module Api
     end
 
     def subscribe
-      #      return unless request.post?
+      return unless request.post?
       group_name = url_decode request[:name]
       feed_uri = url_decode request[:feed_uri]
       feed = Feed.find_or_create(:uri => feed_uri).save
@@ -37,7 +37,7 @@ module Api
     end
 
     def unsubscribe
-      #      return unless request.post?
+      return unless request.post?
       group_name = url_decode request[:name]
       feed_uri = url_decode request[:feed_uri]
       feed = Feed.find(:uri => feed_uri)
