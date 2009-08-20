@@ -5,7 +5,7 @@ $(document).ready(function(){
     });
 
     $('.newfeed form').submit(function() {
-        var feed_uri = $("input[name='feed-uri']")[0].value;
+        var feed_uri = $("input[name='feed-uri']").val();
         if (!feed_uri) return false;
         $.post('/api/group/subscribe',
                { feed_uri: feed_uri,
@@ -19,7 +19,7 @@ $(document).ready(function(){
 
         $('.newfeed .new-button').show();
         $('.newfeed .new-input').hide();
-        $("input[name='feed-uri']")[0].value = '';
+        $("input[name='feed-uri']").val("");
 
         return false;
     });
