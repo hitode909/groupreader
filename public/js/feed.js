@@ -1,9 +1,12 @@
 (function() {
     var feedElement = function(feed) {
         var elem = $("<div>").addClass("feed-item");
+
         var a = $("<a>").attr("href", feed.link || feed.uri);
-        a.append($("<span>").addClass("favicon").append($(["<img src='", feed.favicon, "' title='", feed.name, "' alt='", feed.name, "'>"].join(""))));
-        a.append($("<span>").addClass("title").text(feed.name));
+        var favicon = $("<span>").addClass("favicon").append($("<img>").attr({src: feed.favicon, title: feed.name, alt: feed.name}));
+        var title = $("<span>").addClass("title").text(feed.name);
+        a.append(favicon).append(title);
+
         var removeButton = $("<span>").addClass("delete-button").text("[x]");
         removeButton.click(function(){
             if (!confirm(feed.name + " unsubscribe?")) return;
@@ -37,7 +40,7 @@
         var element = $("<div>").addClass("item");
         if (item.pubDate) element.data('date', Date.parse(item.pubDate));
         var header = $("<div>").addClass("item-header");
-        header.append($(['<a href="', item.link, '">', item.title, '</a>'].join('')));
+        header.append($("<a>").attr("href", item.link)).append(document.createTextNode(item.title));
 
         if (item.title != item.description && item.title != $(item.description).text) {
             var body = $("<div>").addClass("item-body");
@@ -48,7 +51,7 @@
 
         var footer = $("<div>").addClass("item-footer");
         var footerMenu = $("<ul>");
-        if (feed.uri)     footerMenu.append($("<li>").append($(['<a target="_blank" href="', feed.uri, '"><img src="', feed.favicon, '">', feed.name, '</a>'].join(''))));
+        if (feed.uri)     footerMenu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.uri }).append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
         if (item.pubDate) footerMenu.append($("<li>").text('at ' + new Date(item.pubDate).toLocaleFormat('%Y-%m-%d %H:%M')));
         if (item.creator) footerMenu.append($("<li>").text('by ' + item.creator));
         footer.append(footerMenu);
