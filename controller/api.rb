@@ -31,8 +31,7 @@ module Api
       group_name = url_decode request[:name]
       feed_uri = url_decode request[:feed_uri]
       feed = Feed.find_or_create(:uri => feed_uri).save
-      group = Group.find(:name => group_name)
-      respond('The group not found', 404) unless group
+      group = Group.find_or_create(:name => group_name).save
       if group and not group.feeds_dataset[:uri => feed_uri]
         group.add_feed(feed)
       end

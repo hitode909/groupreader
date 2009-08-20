@@ -14,7 +14,6 @@ class GroupController < Controller
     @group = Group.find(:name => group_name)
     @group_name = group_name
     @title = 'group/' + @group_name
-    render_view(@group ? :index_has_group : :index_no_group)
   end
 end
 
