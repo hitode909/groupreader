@@ -12,7 +12,6 @@
                 favicon: "http://favicon.hatena.ne.jp/?uri=" + encodeURIComponent(feed.uri)
             }, feed);
 
-            // TODO ’¤´’¤Á’¤ã’¤Ã’¤È’¤·’¤Æ’¤ë
             var feedElement = function(feed) {
                 var elem = $("<div>").addClass("feed-item");
                 var a = $("<a>").attr("href", feed.link || feed.uri);
@@ -52,7 +51,6 @@
             feedTarget.append(elem);
             $.getJSON("/api/feed/get", {uri: feed.uri}, function(data) {
                 $(".loading-icon", elem).remove();
-                // TODO: ’¤³’¤³’¤Î’¥í’¥¸’¥Ã’¥¯’¤¬’¤è’¤¯’¤Ê’¤µ’¤½’¤¦’¤Ê’¤Î’¤Ç’¤¢’¤È’¤Ç’¸«’¤ë
                 if (feed.name != data.title) {
                     $("a .title", elem).text(data.title);
                 }
@@ -69,7 +67,6 @@
             return this;
         },
 
-        // TODO: ’¤³’¤Î’°ú’¿ô’¤Ï’¤É’¤¦’¤Ê’¤Î’¤«
         newitem: function(feed, item, itemTarget) {
             if (!itemTarget) itemTarget = $(".items");
 
