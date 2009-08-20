@@ -23,7 +23,7 @@ class Feed < Sequel::Model
     "http://favicon.hatena.ne.jp/?url=" + URI.encode(self.uri)
   end
 
-  def self.json(feed_uri)
+  def self.get(feed_uri)
     feed = Feed.find(:uri => feed_uri)
     result = { };
     source = open(feed_uri).read.toutf8
@@ -114,6 +114,13 @@ class Group < Sequel::Model
 
   def before_destroy
     self.remove_all_feeds
+  end
+
+  def to_hash
+    { :name => self.name,
+      :description => self.description,
+      :feeds => self.feeds.map(&:to_hash),
+    }
   end
 
   create_table unless table_exists?
