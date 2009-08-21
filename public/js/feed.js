@@ -129,10 +129,10 @@ $(document).ready(function(){
     });
 
     $('.newfeed form').submit(function() {
-        var feed_uri = $("input[name='feed-uri']").val();
-        if (!feed_uri) return false;
+        var uri = $("input[name='feed-uri']").val();
+        if (!uri) return false;
         $.post('/api/group/subscribe',
-               { feed_uri: feed_uri,
+               { uri: uri,
                  name: GroupReader.group
                },
                function(feed){

@@ -27,13 +27,16 @@ module Api
     def subscribe
       return unless request.post?
       group_name = url_decode request[:name]
-      feed_uri = url_decode request[:feed_uri]
-      feed = Feed.find_or_create(:uri => feed_uri).save
+      uri = url_decode request[:uri]
+      return unless uri
+      feeds = Feed.find_feeds(uri)
       group = Group.find_or_create(:name => group_name).save
-      if group and not group.feeds_dataset[:uri => feed_uri]
-        group.add_feed(feed)
+      feeds.each do |feed|
+        if group and not group.feeds_dataset[:uri => feed.uri]
+          group.add_feed(feed)
+        end
       end
-      feed.to_hash
+      feeds.map(&:to_hash)
     end
 
     def unsubscribe

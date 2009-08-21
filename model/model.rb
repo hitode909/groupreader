@@ -91,7 +91,7 @@ class Feed < Sequel::Model
   def to_hash
     { :name    => self.name,
       :uri     => self.uri,
-      :favicon => self.favicon_uri,
+      :favicon => self.favicon,
       :link    => self.link,
     }
   end
@@ -145,7 +145,6 @@ class Group < Sequel::Model
 
   def to_hash
     { :name => self.name,
-      :description => self.description,
       :feeds => self.feeds.map(&:to_hash),
     }
   end
