@@ -86,9 +86,11 @@ class Feed < Sequel::Model
     source = open(self.uri).read.toutf8
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
     self.title = rss.channel.title
-    blog_uri = rss.channel.link
-    if blog_uri
-      self.blog = Blog.find_or_create(:uri => blog_uri)
+    unless self.blog_id
+      blog_uri = rss.channel.link
+      if blog_uri
+        self.blog = Blog.find_or_create(:uri => blog_uri)
+      end
     end
     self.save
   end
@@ -170,7 +172,9 @@ class Blog < Sequel::Model
     xml = Nokogiri(open(uri).read)
     feed_uris = xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').each do |link|
       uri = (uriobj + link['href']).to_s
-      self.add_feed Feed.find_or_create(:uri => uri)
+      feed = Feed.find(:uri => uri)
+      feed = Feed.create(:uri => uri, :blog_id => self.id) unless feed
+      self.add_feed feed
     end
 
     self.favicon = xml.xpath('//link[@rel="shortcut icon"]').first['href'] rescue (uriobj + '/favicon.ico').to_s
