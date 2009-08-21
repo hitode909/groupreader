@@ -14,9 +14,12 @@ class Feed < Sequel::Model
     String :link
     String :favicon
     Boolean :valid, :default => true
+    foreign_key :blog_id
     time :created_at
     time :modified_at
   end
+  many_to_one :blog
+
 
   def name
     self.title or self.uri
@@ -102,12 +105,21 @@ class Feed < Sequel::Model
 
   def after_create
     # get title and set to title
-    Thread.new do
-      source = open(self.uri).read.toutf8
-      rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
-      self.title = rss.channel.title
-      self.save
+    self.fetch_meta_data
+  end
+
+  def fetch_meta_data
+    return if self.blog
+
+    source = open(self.uri).read.toutf8
+    rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
+    blog_uri = rss.channel.link
+    if blog_uri
+      self.blog = Blog.find_or_create(:uri => blog_uri)
+    else
+      p 'no link'
     end
+    self.save
   end
 
   def before_save
@@ -152,24 +164,49 @@ class Group < Sequel::Model
   create_table unless table_exists?
 end
 
-# ToDo: Sequelのモデルにする？
-class Blog
-  attr_accessor :feed_uris, :favicon, :title
-  def self.get(uri, source = nil)
-    uriobj = URI.parse(uri)
-    xml = Nokogiri(source || open(uri).read)
-    blog = self.new
-    blog.feed_uris = begin xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').map{|link|
-        (uriobj + link['href']).to_s
-      } rescue [] end
-    blog.favicon = begin
-                     xml.xpath('//link[@rel="shortcut icon"]').first['href']
-                   rescue
-                     (uriobj + '/favicon.ico').to_s
-                   end
-    blog.title = xml.xpath('//title').first.content rescue nil
-    blog
+class Blog < Sequel::Model
+  set_schema do
+    primary_key :id
+    String :uri, :unique => true, :null => false
+    String :title
+    String :favicon
+    Boolean :valid, :default => true
+    time :created_at
+    time :modified_at
   end
+  one_to_many :feeds
+  create_table unless table_exists?
+
+  def before_create
+    self.created_at = Time.now
+  end
+
+  def after_create
+    self.fetch_meta_data
+  end
+
+  def before_save
+    self.modified_at = Time.now
+  end
+
+  def before_destroy
+    self.feeds.each {|feed| feed.destroy}
+  end
+
+  def fetch_meta_data
+    p 'fetch blog'
+    uriobj = URI.parse(self.uri)
+    xml = Nokogiri(open(uri).read)
+    feed_uris = xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').each do |link|
+      uri = (uriobj + link['href']).to_s
+      self.add_feed Feed.find_or_create(:uri => uri)
+    end
+
+    self.favicon = xml.xpath('//link[@rel="shortcut icon"]').first['href'] rescue (uriobj + '/favicon.ico').to_s
+    begin self.title = xml.xpath('//title').first.content rescue nil end
+    self.save
+  end
+
 end
 
 unless DB.table_exists?(:feeds_groups)
