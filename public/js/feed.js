@@ -40,7 +40,7 @@
         var element = $("<div>").addClass("item");
         if (item.pubDate) element.data('date', Date.parse(item.pubDate));
         var header = $("<div>").addClass("item-header");
-        header.append($("<a>").attr("href", item.link)).append(document.createTextNode(item.title));
+        header.append($("<a>").attr("href", item.link).text(item.title));
 
         if (item.title != item.description && item.title != $(item.description).text) {
             var body = $("<div>").addClass("item-body");
@@ -104,7 +104,7 @@
 
                 $(data.items).each(function() {
                     var item = this;
-                    elem.data("items").push($.newitem(feed, item));
+                    elem.data("items").push($.newitem(feed, item, itemTarget));
                 });
             });
 
