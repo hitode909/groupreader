@@ -43,7 +43,7 @@ a img {
     padding-right: 16px;
 }
 
-.newfeed {
+.newfeed .new-button {
   text-decoration: underline;
   cursor: pointer;
 }

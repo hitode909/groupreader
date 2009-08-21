@@ -131,11 +131,15 @@ $(document).ready(function(){
     $('.newfeed form').submit(function() {
         var uri = $("input[name='feed-uri']").val();
         if (!uri) return false;
+        $('.newfeed .loading').show();
+
         $.post('/api/group/subscribe',
                { uri: uri,
                  name: GroupReader.group
                },
                function(feed){
+                   $('.newfeed .loading').hide();
+
                    if ($.isArray(feed)) {
                        $.each(feed, function(index, val) {
                            $.newfeed(val);
