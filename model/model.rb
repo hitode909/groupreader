@@ -109,15 +109,14 @@ class Feed < Sequel::Model
   end
 
   def fetch_meta_data
-    return if self.blog
+    return if self.blog and self.title
 
     source = open(self.uri).read.toutf8
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
+    self.title = rss.channel.title
     blog_uri = rss.channel.link
     if blog_uri
       self.blog = Blog.find_or_create(:uri => blog_uri)
-    else
-      p 'no link'
     end
     self.save
   end
