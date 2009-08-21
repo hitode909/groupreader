@@ -11,8 +11,6 @@ class Feed < Sequel::Model
     primary_key :id
     String :uri, :unique => true, :null => false
     String :title
-    String :link
-    String :favicon
     Boolean :valid, :default => true
     foreign_key :blog_id
     time :created_at
@@ -20,37 +18,21 @@ class Feed < Sequel::Model
   end
   many_to_one :blog
 
-
-  def name
-    self.title or self.uri
-  end
-
-  def favicon_uri
-    "http://favicon.hatena.ne.jp/?url=" + URI.encode(self.uri)
-  end
-
   def self.find_feeds(uri)
     if Feed.find(:uri => uri)
       return [Feed.find(:uri => uri)]
+    elsif Blog.find(:uri => uri)
+      return Blog.find(:uri => uri).feeds
     end
 
+    # return new feeds
     source = open(uri).read
     input = Nokogiri(source)
-    feeds = []
     if input.html?
-      blog = Blog.get(uri, source)
-      blog.feed_uris.each { |feed_uri|
-        feed = Feed.find_or_create(:uri => feed_uri)
-        feed.favicon = blog.favicon
-        feed.link = uri
-        feed.title = blog.title
-        feed.save
-        feeds << feed
-      }
+      Blog.create(:uri => uri).feeds
     else
-      feeds << Feed.find_or_create(:uri => uri)
+      Feed.create(:uri => uri)
     end
-    feeds
   end
 
   def self.get(feed_uri)
@@ -72,16 +54,6 @@ class Feed < Sequel::Model
       }
     end
 
-    if feed and rss.channel.title
-      feed.title = rss.channel.title
-      feed.save
-    end
-
-    if feed and not feed.valid
-      feed.valid = true
-      feed.save
-    end
-
     result
   rescue => e
     if feed
@@ -92,10 +64,10 @@ class Feed < Sequel::Model
   end
 
   def to_hash
-    { :name    => self.name,
+    { :name    => self.title,
       :uri     => self.uri,
-      :favicon => self.favicon,
-      :link    => self.link,
+      :favicon => self.blog.favicon,
+      :link    => self.blog.uri,
     }
   end
 
@@ -104,12 +76,12 @@ class Feed < Sequel::Model
   end
 
   def after_create
-    # get title and set to title
     self.fetch_meta_data
   end
 
   def fetch_meta_data
     return if self.blog and self.title
+    p "fetch feed(#{self.uri})"
 
     source = open(self.uri).read.toutf8
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
@@ -193,7 +165,7 @@ class Blog < Sequel::Model
   end
 
   def fetch_meta_data
-    p 'fetch blog'
+    p "fetch blog(#{self.uri})"
     uriobj = URI.parse(self.uri)
     xml = Nokogiri(open(uri).read)
     feed_uris = xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').each do |link|
