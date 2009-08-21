@@ -135,8 +135,14 @@ $(document).ready(function(){
                { feed_uri: feed_uri,
                  name: GroupReader.group
                },
-               function(data){
-                   $.newfeed(data);
+               function(feed){
+                   if ($.isArray(feed)) {
+                       $.each(feed, function(index, val) {
+                           $.newfeed(val);
+                       });
+                   } else {
+                       $.newfeed(feed);
+                   }
                },
                'json'
               );
