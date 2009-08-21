@@ -4,12 +4,15 @@ require 'kconv'
 require 'open-uri'
 require 'rss'
 require 'time'
+require 'nokogiri'
 
 class Feed < Sequel::Model
   set_schema do
     primary_key :id
     String :uri, :unique => true, :null => false
     String :title
+    String :link
+    String :favicon
     Boolean :valid, :default => true
     time :created_at
     time :modified_at
@@ -21,6 +24,30 @@ class Feed < Sequel::Model
 
   def favicon_uri
     "http://favicon.hatena.ne.jp/?url=" + URI.encode(self.uri)
+  end
+
+  def self.find_feeds(uri)
+    if Feed.find(:uri => uri)
+      return [Feed.find(:uri => uri)]
+    end
+
+    source = open(uri).read
+    input = Nokogiri(source)
+    feeds = []
+    if input.html?
+      blog = Blog.get(uri, source)
+      blog.feed_uris.each { |feed_uri|
+        feed = Feed.find_or_create(:uri => feed_uri)
+        feed.favicon = blog.favicon
+        feed.link = uri
+        feed.title = blog.title
+        feed.save
+        feeds << feed
+      }
+    else
+      feeds << Feed.find_or_create(:uri => uri)
+    end
+    feeds
   end
 
   def self.get(feed_uri)
@@ -64,7 +91,8 @@ class Feed < Sequel::Model
   def to_hash
     { :name    => self.name,
       :uri     => self.uri,
-      :favicon => self.favicon_uri
+      :favicon => self.favicon_uri,
+      :link    => self.link,
     }
   end
 
@@ -123,6 +151,22 @@ class Group < Sequel::Model
   end
 
   create_table unless table_exists?
+end
+
+# ToDo: Sequelのモデルにする？
+class Blog
+  attr_accessor :feed_uris, :favicon, :title
+  def self.get(uri, source = nil)
+    uriobj = URI.parse(uri)
+    xml = Nokogiri(source || open(uri).read)
+    blog = self.new
+    blog.feed_uris = begin xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').map{|link|
+        (uriobj + link['href']).to_s
+      } rescue [] end
+    blog.favicon = xml.xpath('//link[@rel="shortcut icon"]').first['href'] rescue nil
+    blog.title = xml.xpath('//title').first.content rescue nil
+    blog
+  end
 end
 
 unless DB.table_exists?(:feeds_groups)
