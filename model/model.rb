@@ -31,7 +31,7 @@ class Feed < Sequel::Model
     if input.html?
       Blog.create(:uri => uri).feeds
     else
-      Feed.create(:uri => uri)
+      [Feed.create(:uri => uri)]
     end
   end
 
