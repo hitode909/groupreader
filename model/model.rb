@@ -162,7 +162,11 @@ class Blog
     blog.feed_uris = begin xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').map{|link|
         (uriobj + link['href']).to_s
       } rescue [] end
-    blog.favicon = xml.xpath('//link[@rel="shortcut icon"]').first['href'] rescue nil
+    blog.favicon = begin
+                     xml.xpath('//link[@rel="shortcut icon"]').first['href']
+                   rescue
+                     (uriobj + '/favicon.ico').to_s
+                   end
     blog.title = xml.xpath('//title').first.content rescue nil
     blog
   end
