@@ -5,6 +5,19 @@ require 'open-uri'
 require 'rss'
 require 'time'
 require 'nokogiri'
+require 'memcache'
+require 'Logger'
+
+module ExternalResource
+  @cache = MemCache.new('localhost:11211', {:namespace, 'groupreader', :logger, Logger.new(STDOUT)})
+  def self.get(uri)
+    old = @cache[uri]
+    return old if old
+    source = open(uri).read.toutf8
+    @cache.set(uri, source, 10 * 60)
+    source
+  end
+end
 
 class Feed < Sequel::Model
   set_schema do
@@ -26,7 +39,7 @@ class Feed < Sequel::Model
     end
 
     # return new feeds
-    source = open(uri).read
+    source = ExternalResource.get(uri)
     input = Nokogiri(source)
     if input.html?
       Blog.create(:uri => uri).feeds
@@ -38,7 +51,7 @@ class Feed < Sequel::Model
   def self.get(feed_uri)
     feed = Feed.find(:uri => feed_uri)
     result = { };
-    source = open(feed_uri).read.toutf8
+    source = ExternalResource.get(feed_uri)
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
     result['title'] = rss.channel.title
     result['link'] = rss.channel.link
@@ -83,7 +96,7 @@ class Feed < Sequel::Model
     return if self.blog and self.title
     p "fetch feed(#{self.uri})"
 
-    source = open(self.uri).read.toutf8
+    source = ExternalResource.get(self.uri)
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
     self.title = rss.channel.title
     unless self.blog_id
@@ -169,7 +182,7 @@ class Blog < Sequel::Model
   def fetch_meta_data
     p "fetch blog(#{self.uri})"
     uriobj = URI.parse(self.uri)
-    xml = Nokogiri(open(uri).read)
+    xml = Nokogiri(ExternalResource.get(uri))
     feed_uris = xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').each do |link|
       uri = (uriobj + link['href']).to_s
       feed = Feed.find(:uri => uri)
