@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class MainController < Controller
   # the index action is called automatically when no other action is specified
   def index
@@ -16,12 +14,3 @@ class GroupController < Controller
     @title = 'group/' + @group_name
   end
 end
-
-class FeedController < Controller
-  def index(feed_uri)
-    @feed_uri = url_decode(feed_uri)
-    @feed = Feed.find(:uri => @feed_uri)
-    @title = 'feed/' + @feed ? @feed.name : @feed_uri
-  end
-end
-
