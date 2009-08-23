@@ -18,6 +18,7 @@ unless DB.table_exists?(:feeds_groups)
   DB.create_table :feeds_groups do
     foreign_key :feed_id, :table => :feeds
     foreign_key :group_id, :table => :groups
+    unique [:feed_id, :group_id]
   end
 end
 
@@ -25,6 +26,7 @@ unless DB.table_exists?(:blogs_feeds)
   DB.create_table :blogs_feeds do
     foreign_key :blog_id, :table => :blogs
     foreign_key :feed_id, :table => :feeds
+    unique [:blog_id, :feed_id]
   end
 end
 
