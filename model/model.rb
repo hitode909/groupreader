@@ -8,7 +8,11 @@ module ExternalResource
   def self.get(uri)
     old = @cache[uri]
     return old if old
-    source = open(uri).read
+    begin
+      source = open(uri).read
+    rescue                      # ToDo better way
+      return ''
+    end
     @cache.set(uri, source, 10 * 60)
     source
   end

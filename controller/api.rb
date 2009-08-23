@@ -28,12 +28,14 @@ module Api
       return unless request.post?
       group_name = url_decode request[:name]
       uri = url_decode request[:uri]
-      return unless uri
-      feeds = Feed.find_feeds(uri)
+      return unless uri.length
+      uris = uri.split(',')
       group = Group.find_or_create(:name => group_name).save
+      feeds = uris.map{|u| Feed.find_feeds(u.strip)}.flatten.compact
       feeds.each do |feed|
-        if group and not group.feeds_dataset[:uri => feed.uri]
+        begin
           group.add_feed(feed)
+        rescue
         end
       end
       feeds.map(&:to_hash)
@@ -46,8 +48,9 @@ module Api
       feed = Feed.find(:uri => feed_uri)
       group = Group.find(:name => group_name)
       respond('The group not found', 404) unless group
-      if group and group.feeds_dataset[:uri => feed_uri]
+      begin
         group.remove_feed(feed)
+      rescue
       end
       group.to_hash
     end
