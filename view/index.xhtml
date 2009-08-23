@@ -1,6 +1,17 @@
-<h2>グループ</h2>
-<ul>
+<script type="text/javascript" src="js/index.js"></script>
+<table class="groups">
   <?r @groups.each do |group| ?>
-  <li>#{ anchor(group.name, GroupController.r(group.name)) }</li>
+  <tr>
+    <td>#{ anchor(group.name, GroupController.r(group.name)) }</td>
+    <td>#{h group.feeds.length } feeds</td>
+    <td>modified at #{ group.modified_at }</td>
+  </tr>
   <?r end ?>
-</ul>
+  <tr>
+    <td>
+      <form>
+        go: <input type="text" name="group-name" />
+      </form>
+    </td>
+  </tr>
+</table>
