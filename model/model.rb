@@ -2,14 +2,13 @@ require 'uri'
 require 'kconv'
 require 'open-uri'
 require 'memcache'
-require 'Logger'
 
 module ExternalResource
-  @cache = MemCache.new('localhost:11211', {:namespace, 'groupreader', :logger, Logger.new(STDOUT)})
+  @cache = MemCache.new('localhost:11211', {:namespace, 'groupreader',})
   def self.get(uri)
     old = @cache[uri]
     return old if old
-    source = open(uri).read.toutf8
+    source = open(uri).read
     @cache.set(uri, source, 10 * 60)
     source
   end
