@@ -5,7 +5,7 @@ h1, h2, h3 {
 
 body {
   margin: 2em;
-  background: #000;
+  background: #fff;
 }
 
 table.groups {
@@ -19,22 +19,15 @@ a img {
   border-style: none;
 }
 
-#title {
-  background: #fff;
-  margin: 0 auto 0;
-  max-width: 900px;
-  width: 90%;
-}
-
 #title h1 {
   padding: 30px;
 }
 
-#content {
+#title, #content, #footer {
   margin:0 auto 0;
-  max-width: 900px;
-  width: 90%;
+  width: 100%;
   background: #fff;
+  margin-bottom: 30px;
 }
 
 .navigation-top {
