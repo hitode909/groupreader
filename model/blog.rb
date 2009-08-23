@@ -11,7 +11,7 @@ class Blog < Sequel::Model
     time :created_at
     time :modified_at
   end
-  one_to_many :feeds
+  many_to_many :feeds
   create_table unless table_exists?
 
   def before_create
