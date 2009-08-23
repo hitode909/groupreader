@@ -50,9 +50,20 @@ a img {
     padding-right: 16px;
 }
 
-.newfeed .new-button {
+.navigation-top .feed-item a {
+  color: #000;
+  text-decoration: none;
+}
+.navigation-top .feed-item a:hover {
   text-decoration: underline;
+}
+
+.newfeed .new-button {
   cursor: pointer;
+}
+
+.newfeed .new-button:hover {
+  text-decoration: underline;
 }
 
 div.item {
@@ -123,4 +134,13 @@ div.item .item-footer ul {
 div.item .item-footer li {
     display: inline;
     margin-right: 5px;
+}
+
+
+.delete-button {
+  cursor: pointer;
+  margin-left: 4px;
+}
+.delete-button:hover {
+  text-decoration: underline;
 }
