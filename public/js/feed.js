@@ -48,11 +48,10 @@
         } else {
             var body = false;
         }
-
         var footer = $("<div>").addClass("item-footer");
         var footerMenu = $("<ul>");
         if (feed.uri)     footerMenu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.uri }).append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
-        if (item.pubDate) footerMenu.append($("<li>").text('at ' + new Date(item.pubDate).toLocaleFormat('%Y-%m-%d %H:%M')));
+        if (item.pubDate) footerMenu.append($("<li>").text('at ' + item.pubDate));
         if (item.creator) footerMenu.append($("<li>").text('by ' + item.creator));
         footer.append(footerMenu);
 
