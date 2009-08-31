@@ -6,6 +6,7 @@ class Group < Sequel::Model
     time :modified_at
   end
   many_to_many :feeds
+  one_to_many  :activities
 
   def before_create
     self.created_at = Time.now

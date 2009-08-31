@@ -3,7 +3,7 @@ class Activity < Sequel::Model
     primary_key :id
     foreign_key :feed_id,  :null => false
     foreign_key :group_id, :null => false
-    text :type
+    text :operation
     time :created_at
     time :modified_at
   end
@@ -21,11 +21,19 @@ class Activity < Sequel::Model
 
   def self.subscribe(group, feed)
     Ramaze::Log.debug "subscribed(#{group.name}, #{feed.title})"
-    self.create :group => group , :feed => feed, :type => 'subscribe'
+    self.create :group => group , :feed => feed, :operation => 'subscribe'
   end
 
   def self.unsubscribe(group, feed)
     Ramaze::Log.debug "unsubscribed(#{group.name}, #{feed.title})"
-    self.create :group => group , :feed => feed, :type => 'unsubscribe'
+    self.create :group => group , :feed => feed, :operation => 'unsubscribe'
   end
+
+  def to_hash
+    { :time => self.created_at,
+      :operation => self.operation,
+      :feed => self.feed.to_hash,
+    }
+  end
+
 end

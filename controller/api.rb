@@ -58,6 +58,13 @@ module Api
       end
       group.to_hash
     end
+
+    def activities
+      group_name = url_decode request[:name]
+      group = Group.find(:name => group_name)
+      respond('The group not found', 404) unless group
+      group.activities.map(&:to_hash)
+    end
   end
 
   class FeedController < JsonController
