@@ -36,6 +36,8 @@ module Api
         begin
           group.add_feed(feed)
         rescue
+        else
+          Activity.subscribe(group, feed)
         end
       end
       feeds.map(&:to_hash)
@@ -51,6 +53,8 @@ module Api
       begin
         group.remove_feed(feed)
       rescue
+      else
+        Activity.unsubscribe(group, feed)
       end
       group.to_hash
     end
