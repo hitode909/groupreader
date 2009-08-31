@@ -3,7 +3,7 @@
         var elem = $("<div>").addClass("feed-item");
 
         var a = $("<a>").attr("href", feed.link || feed.uri);
-        var favicon = $("<span>").addClass("favicon").append($("<img>").attr({src: feed.favicon, title: feed.name, alt: feed.name}));
+        var favicon = $("<span>").addClass("favicon").append($("<img>").attr({src: feed.favicon}));
         var title = $("<span>").addClass("title").text(feed.name);
         a.append(favicon).append(title);
 
