@@ -1,7 +1,7 @@
 require 'rss'
 require 'time'
 require 'nokogiri'
-
+require 'sanitize'
 
 class Feed < Sequel::Model
   set_schema do
@@ -46,7 +46,8 @@ class Feed < Sequel::Model
         'title' => item.title,
         'pubDate' => (item.dc_date || item.pubDate).rfc822,
         'creator' => item.dc_creator,
-        'description' => (item.content_encoded || item.description),
+        'description' => Sanitize.clean((item.content_encoded || item.description),
+          Sanitize::Config::RELAXED),
         'link' => item.link,
       }
     end
