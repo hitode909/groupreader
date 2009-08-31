@@ -44,6 +44,10 @@ a img {
     padding-right: 16px;
 }
 
+.navigation-top .feed-item:hover {
+    padding-right: 2px;
+}
+
 .navigation-top .feed-item a {
   color: #000;
   text-decoration: none;
@@ -132,7 +136,7 @@ div.item .item-footer li {
 
 .feed-item .delete-button {
   cursor: pointer;
-  margin-left: 4px;
+  margin-left: 2px;
   display: none;
 }
 
