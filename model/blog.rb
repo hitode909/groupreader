@@ -41,7 +41,7 @@ class Blog < Sequel::Model
       self.add_feed feed
     end
 
-    self.favicon = xml.xpath('//link[contains(concat(" ",@rel), " icon")]').first['href'] rescue (uriobj + '/favicon.ico').to_s
+    self.favicon = xml.xpath('//link[contains(concat(" ",@rel), " icon ")]').first['href'] rescue (uriobj + '/favicon.ico').to_s
     begin self.title = xml.xpath('//title').first.content rescue nil end
     self.save
   end
