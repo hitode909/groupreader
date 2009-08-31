@@ -79,7 +79,7 @@ class Feed < Sequel::Model
 
   def fetch_meta_data
     return if self.blog and self.title
-    p "fetch feed(#{self.uri})"
+    Ramaze::Log.debug "fetch feed(#{self.uri})"
 
     source = ExternalResource.get(self.uri)
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end

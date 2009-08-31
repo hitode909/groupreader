@@ -31,7 +31,7 @@ class Blog < Sequel::Model
   end
 
   def fetch_meta_data
-    p "fetch blog(#{self.uri})"
+    Ramaze::Log.debug "fetch blog(#{self.uri})"
     uriobj = URI.parse(self.uri)
     xml = Nokogiri(ExternalResource.get(uri))
     feed_uris = xml.xpath('//link[@rel="alternate"][@type="application/rss+xml"]').each do |link|
