@@ -7,7 +7,7 @@
         var title = $("<span>").addClass("title").text(feed.name);
         a.append(favicon).append(title);
 
-        var removeButton = $("<span>").addClass("delete-button").text("[x]");
+        var removeButton = $("<span>").addClass("delete-button").append($("<img>").attr({src: "/image/delete.png"}));
         removeButton.click(function(){
             elem.append(loadingElement());
             $.post('/api/group/unsubscribe',

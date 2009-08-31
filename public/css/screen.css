@@ -130,11 +130,13 @@ div.item .item-footer li {
     margin-right: 5px;
 }
 
-
-.delete-button {
+.feed-item .delete-button {
   cursor: pointer;
   margin-left: 4px;
+  display: none;
 }
-.delete-button:hover {
-  text-decoration: underline;
+
+
+.feed-item:hover .delete-button {
+  display: inline;
 }
