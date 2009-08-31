@@ -9,8 +9,6 @@
 
         var removeButton = $("<span>").addClass("delete-button").text("[x]");
         removeButton.click(function(){
-            if (!confirm(feed.name + " unsubscribe?")) return;
-
             elem.append(loadingElement());
             $.post('/api/group/unsubscribe',
                    { feed_uri: feed.uri,
