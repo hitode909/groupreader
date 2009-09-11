@@ -7,6 +7,7 @@ module Api
       group.to_hash
     end
 
+=begin
     def create
       return unless request.post?
       name = request[:name]
@@ -23,7 +24,7 @@ module Api
       group.destroy
       'ok'
     end
-
+=end
     def subscribe
       return unless request.post?
       group_name = url_decode request[:name]
