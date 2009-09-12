@@ -78,8 +78,8 @@ class Feed < Sequel::Model
   end
 
   def to_hash
-    source = ExternalResource.try_get(self.uri)
-    source ? self.class.parse_feed(self, source) :
+#     source = ExternalResource.try_get(self.uri)
+#     source ? self.class.parse_feed(self, source) :
     { :title    => self.title,
       :uri     => self.uri,
       :favicon => self.blog.favicon,
