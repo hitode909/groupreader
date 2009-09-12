@@ -13,7 +13,7 @@ GroupReader.Feeds = [];
 
         var a = $("<a>").attr("href", feed.link || feed.uri);
         var favicon = $("<span>").addClass("favicon").append($("<img>").attr({src: feed.favicon}));
-        var title = $("<span>").addClass("title").text(feed.name);
+        var title = $("<span>").addClass("title").text(feed.title);
         a.append(favicon).append(title);
 
         var removeButton = $("<span>").addClass("delete-button").append($("<img>").attr({src: "/image/delete.png"}));
@@ -48,7 +48,7 @@ GroupReader.Feeds = [];
         var header = $("<div>").addClass("item-header");
         header.append($("<a>").addClass("title-link").attr("href", item.link).text(item.title));
         var menu = $("<ul>").addClass("header-info");
-        if (feed.link || feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link || feed.uri}).addClass('source').append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
+        if (feed.link || feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link || feed.uri}).addClass('source').append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.title))));
         if (item.pubDate) menu.append($("<li>").text(ambtime(new Date(item.pubDate))));
         if (item.creator) menu.append($("<li>").text('by ' + item.creator));
         header.append(menu);
@@ -82,9 +82,9 @@ GroupReader.Feeds = [];
             var elem = feedElement(feed);
             elem.append(loadingElement());
             feedTarget.append(elem);
-            $.getJSON("/api/feed/get", {uri: feed.uri}, function(data) {
+            var callback = function(data) {
                 $(".loading-icon", elem).remove();
-                if (feed.name != data.title) {
+                if (feed.title != data.title) {
                     $("a .title", elem).text(data.title);
                 }
                 if (feed.link != data.link) {
@@ -96,7 +96,12 @@ GroupReader.Feeds = [];
                     elem.data("items").push($.newitem(feed, item, itemTarget));
                 });
                 $.updatePager();
-            });
+            };
+            if (feed.items) {
+                callback(feed);
+            } else {
+                $.getJSON("/api/feed/get", {uri: feed.uri}, callback);
+            }
 
             return elem;
         },
@@ -180,7 +185,7 @@ GroupReader.Feeds = [];
             element.data('date', Date.parse(item.date));
             var header = $("<div>").addClass("item-header");
             var status = item.operation == "subscribe" ? "+" : "-";
-            header.append($("<a>").addClass("title-link").attr("href", feed.link).text(status + " " + feed.name));
+            header.append($("<a>").addClass("title-link").attr("href", feed.link).text(status + " " + feed.title));
             var menu = $("<ul>").addClass("header-info");
             menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link}).addClass('source').append($("<img>").attr("src", feed.favicon))));
             menu.append($("<li>").text(ambtime(new Date(item.date))));

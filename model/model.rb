@@ -16,6 +16,10 @@ module ExternalResource
     @cache.set(uri, source, 10 * 60)
     source
   end
+
+  def self.try_get(key)
+    @cache[key]
+  end
 end
 
 unless DB.table_exists?(:feeds_groups)

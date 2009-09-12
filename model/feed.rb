@@ -34,11 +34,23 @@ class Feed < Sequel::Model
 
   def self.get(feed_uri)
     feed = Feed.find(:uri => feed_uri)
-    result = { };
     source = ExternalResource.get(feed_uri)
+    parse_feed(feed, source)
+  rescue => e
+    if feed
+      feed.valid = false
+      feed.save
+    end
+    e
+  end
+
+  def self.parse_feed(feed, source)
+    result = { };
     rss = begin RSS::Parser.parse(source) rescue RSS::Parser.parse(source, false) end
     result['title'] = rss.channel.title
     result['link'] = rss.channel.link
+    result['uri'] = feed.uri
+    result['favicon'] = feed.blog.favicon
     result['creator'] = rss.channel.dc_creator
     result['description'] = rss.channel.description
     result['items'] = rss.items.map do |item|
@@ -53,16 +65,12 @@ class Feed < Sequel::Model
     end
 
     result
-  rescue => e
-    if feed
-      feed.valid = false
-      feed.save
-    end
-    e
   end
 
   def to_hash
-    { :name    => self.title,
+    source = ExternalResource.try_get(self.uri)
+    source ? self.class.parse_feed(self, source) :
+    { :title    => self.title,
       :uri     => self.uri,
       :favicon => self.blog.favicon,
       :link    => self.blog.uri,
