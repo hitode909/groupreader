@@ -41,7 +41,7 @@ module Api
           Activity.subscribe(group, feed)
         end
       end
-      feeds.map(&:to_hash)
+      group.to_hash
     end
 
     def unsubscribe

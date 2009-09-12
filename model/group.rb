@@ -23,6 +23,12 @@ class Group < Sequel::Model
   def to_hash
     { :name => self.name,
       :feeds => self.feeds.map(&:to_hash),
+      :activities => self.activities.map(&:to_hash)
+    }
+  end
+
+  def to_simple_hash
+    { :name => self.name
     }
   end
 

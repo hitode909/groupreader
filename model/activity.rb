@@ -30,7 +30,7 @@ class Activity < Sequel::Model
   end
 
   def to_hash
-    { :time => self.created_at,
+    { :date => self.created_at,
       :operation => self.operation,
       :feed => self.feed.to_hash,
     }

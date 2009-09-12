@@ -73,6 +73,10 @@ div.item {
 
 }
 
+.activity .title-link{
+//    font-size: 1.5em;
+}
+
 div.item .item-header {
     display: inline;
 }

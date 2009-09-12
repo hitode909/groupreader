@@ -5,6 +5,7 @@ GroupReader.Pager = {
     page: 1,
     perpage: 20
 };
+GroupReader.Feeds = [];
 
 (function() {
     var feedElement = function(feed) {
@@ -22,7 +23,8 @@ GroupReader.Pager = {
                    { feed_uri: feed.uri,
                      name: GroupReader.group
                    },
-                   function(data){
+                   function(group){
+                       $.handleGroup(group);
                        $.each(elem.data("items"), function(){this.remove();});
                        elem.remove();
                    },
@@ -48,7 +50,7 @@ GroupReader.Pager = {
         var header = $("<div>").addClass("item-header");
         header.append($("<a>").addClass("title-link").attr("href", item.link).text(item.title));
         var menu = $("<ul>").addClass("header-info");
-        if (feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.uri }).append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
+        if (feed.link || feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link || feed.uri}).addClass('source').append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
         if (item.pubDate) menu.append($("<li>").text(ambtime(new Date(item.pubDate))));
         if (item.creator) menu.append($("<li>").text('by ' + item.creator));
         header.append(menu);
@@ -63,20 +65,6 @@ GroupReader.Pager = {
         element.append(header);
         if (body) element.append(body);
         return element;
-    };
-
-    var appendItem = function(item) {
-        var did = false;
-        var newDate = item.data('date');
-        $("div.item").each(function() {
-            if ($(this).data('date') < newDate) {
-                $(this).before(item);
-                    did = true;
-                return false;
-            }
-            return true;
-        });
-        if (!did) $('div.items').append(item);
     };
 
 
@@ -109,6 +97,7 @@ GroupReader.Pager = {
                     var item = this;
                     elem.data("items").push($.newitem(feed, item, itemTarget));
                 });
+                $.updatePager();
             });
 
             return elem;
@@ -118,12 +107,28 @@ GroupReader.Pager = {
             if (!itemTarget) itemTarget = $(".items");
 
             var itemElem = itemElement(feed, item);
-            setTimeout(function(){appendItem(itemElem);}, 0);
+            $.appendItem(itemElem);
             return itemElem;
         },
+        appendItem: function(item) {
+            var did = false;
+            var newDate = item.data('date');
+            $("div.item").each(function() {
+                if ($(this).data('date') == newDate &&
+                    $('a.source', this).attr('href') == $('a.source', item).attr('href')) {
+                    did = true;
+                    return false;
+                }
+                if ($(this).data('date') < newDate) {
+                    $(this).before(item);
+                    did = true;
+                    return false;
+                }
+                return true;
+            });
+            if (!did) $('div.items').append(item);
+        },
         updatePager: function() {
-            clearTimeout(GroupReader.pagerTimer);
-            GroupReader.pagerTimer = setTimeout(function(){
                 var length = GroupReader.Pager.page * GroupReader.Pager.perpage;
                 $('.item:gt(' + length + ')').hide();
                 $('.item:lt(' + length + ')').show();
@@ -132,7 +137,6 @@ GroupReader.Pager = {
                 } else if($('.more-button').length > 0 && $('.item').length <= length) {
                     $.removeMoreButton();
                 }
-            }, 100);
         },
         appendMoreButton: function() {
             var btn = $('<div>').text('more').addClass('more-button');
@@ -144,6 +148,36 @@ GroupReader.Pager = {
         },
         removeMoreButton: function() {
             $('.more-button').remove();
+        },
+        handleGroup: function(group){
+            if (group.feeds) $.handleFeeds(group.feeds);
+            if (group.activities) $.handleActivities(group.activities);
+            $.updatePager();
+        },
+        handleActivities: function(activities) {
+            $(activities).each(function() {
+                $.appendItem($.activityElement(this));
+            });
+        },
+        handleFeeds: function(feeds) {
+            $.each(feeds, function(index, val) {
+                $.newfeed(val);
+            });
+        },
+
+        activityElement: function(item) {
+            var feed = item.feed;
+            var element = $("<div>").attr("style", "display: none").addClass("activity item");
+            element.data('date', Date.parse(item.date));
+            var header = $("<div>").addClass("item-header");
+            var status = item.operation == "subscribe" ? "+" : "-";
+            header.append($("<a>").addClass("title-link").attr("href", feed.link).text(status + " " + feed.name));
+            var menu = $("<ul>").addClass("header-info");
+            menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link}).addClass('source').append($("<img>").attr("src", feed.favicon))));
+            menu.append($("<li>").text(ambtime(new Date(item.date))));
+            header.append(menu);
+            element.append(header);
+            return element;
         }
     });
 })(jQuery);
@@ -164,16 +198,9 @@ $(document).ready(function(){
                { uri: uri,
                  name: GroupReader.group
                },
-               function(feed){
+               function(group){
                    $('.newfeed .loading').hide();
-
-                   if ($.isArray(feed)) {
-                       $.each(feed, function(index, val) {
-                           $.newfeed(val);
-                       });
-                   } else {
-                       $.newfeed(feed);
-                   }
+                   $.handleGroup(group);
                },
                'json'
               );
@@ -185,13 +212,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $.getJSON('/api/group', {name: GroupReader.group}, function(data) {
-        $(data.feeds).each(function() {
-            $.newfeed(this);
-        });
-    });
-
-    $('.items').bind("DOMSubtreeModified",function() {
-        $.updatePager();
+    $.getJSON('/api/group', {name: GroupReader.group}, function(group) {
+        $.handleGroup(group);
     });
 });
