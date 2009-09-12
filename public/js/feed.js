@@ -25,8 +25,6 @@ GroupReader.Feeds = [];
                    },
                    function(group){
                        $.handleGroup(group);
-                       $.each(elem.data("items"), function(){this.remove();});
-                       elem.remove();
                    },
                    'json'
                   );
@@ -162,6 +160,17 @@ GroupReader.Feeds = [];
         handleFeeds: function(feeds) {
             $.each(feeds, function(index, val) {
                 $.newfeed(val);
+            });
+            var newUris = $.map(feeds,function(v, i){return v.uri; });
+            $(".feed-item").each(function() {
+                var elem = this;
+                if ($(elem).data("feed") &&
+                    $.inArray($(elem).data("feed").uri, newUris) < 0) {
+                    if ($(elem).data("items")) {
+                        $.each($(elem).data("items"), function(){this.remove();});
+                    }
+                    $(elem).remove();
+                }
             });
         },
 
