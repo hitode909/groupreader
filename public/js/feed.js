@@ -38,23 +38,21 @@
         var element = $("<div>").addClass("item");
         if (item.pubDate) element.data('date', Date.parse(item.pubDate));
         var header = $("<div>").addClass("item-header");
-        header.append($("<a>").attr("href", item.link).text(item.title));
-
+        header.append($("<a>").addClass("title-link").attr("href", item.link).text(item.title));
+        var menu = $("<ul>").addClass("header-info");
+        if (feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.uri }).append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
+        if (item.pubDate) menu.append($("<li>").text(ambtime(new Date(item.pubDate))));
+        if (item.creator) menu.append($("<li>").text('by ' + item.creator));
+        header.append(menu);
+        
         if (item.description.length > 0 && item.title != item.description && item.title != $(item.description).text) {
             var body = $("<div>").addClass("item-body");
             body.append($(item.description).length ? $(item.description) : document.createTextNode(item.description));
         } else {
             var body = false;
         }
-        var footer = $("<div>").addClass("item-footer");
-        var footerMenu = $("<ul>");
-        if (feed.uri)     footerMenu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.uri }).append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.name))));
-        if (item.pubDate) footerMenu.append($("<li>").text(ambtime(new Date(item.pubDate))));
-        if (item.creator) footerMenu.append($("<li>").text('by ' + item.creator));
-        footer.append(footerMenu);
 
         element.append(header);
-        element.append(footer);
         if (body) element.append(body);
         return element;
     };

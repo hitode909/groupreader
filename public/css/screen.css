@@ -29,10 +29,11 @@ a img {
   width: 100%;
   background: #fff;
   margin-bottom: 30px;
+  font-size: 90%;
 }
 
 .navigation-top {
-  border-color:#666;
+  border-color:#aaa;
   border-style:solid;
   border-width: 1px 0 1px;
   background: #fff;
@@ -65,17 +66,18 @@ a img {
 }
 
 div.item {
-  padding: 5px;
-  border-color:#666;
+  padding: 5px 2px 5px 2px;
+  border-color:#aaa;
   border-style:solid;
   border-width: 0 0 1px;
 
 }
 
 div.item .item-header {
-   padding: 5px;
-   margin: 0px;
-   font-weight:normal;
+    display: inline;
+}
+div.item .item-header .title-link {
+   font-weight: bold;
 }
 div.item .item-header a {
   color: #000;
@@ -87,10 +89,15 @@ div.item .item-header a:hover {
 }
 
 div.item .item-body {
-  padding: 5px;
+  background: #eef;
+  margin: 6px;
+  padding: 4px;
   line-height:1.2;
 }
 
+div.item .item-body p {
+    margin: 4px 0px 4px 0px;
+}
 div.item .item-body pre {
   margin: 5px;
   border-color: #aaa;
@@ -104,32 +111,34 @@ div.item .item-body blockquote {
   border-width: 1px;
 }
 
-div.item .item-footer {
-    padding-left: 5px;
+div.item .header-info {
+    padding-left: 4px;
+    display: inline;
     font-size: 80%;
     color: #666;
 }
 
 
-div.item .item-footer a {
+div.item .header-info a {
   color: #666;
   text-decoration: none;
 }
 
-div.item .item-footer a:hover {
+div.item .header-info a:hover {
   text-decoration: underline;
 }
 
-div.item .item-footer img {
+div.item .header-info img {
     vertical-align: middle;
 }
 
-div.item .item-footer ul {
+div.item .header-info ul {
     margin: 0px;
     padding: 0px;
+//    float: right;
 }
 
-div.item .item-footer li {
+div.item .header-info li {
     display: inline;
     margin-right: 5px;
 }
