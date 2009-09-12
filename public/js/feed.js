@@ -67,11 +67,11 @@ GroupReader.Pager = {
 
     var appendItem = function(item) {
         var did = false;
-        var newId = item.data('date');
+        var newDate = item.data('date');
         $("div.item").each(function() {
-            if ($(this).data('date') < newId) {
+            if ($(this).data('date') < newDate) {
                 $(this).before(item);
-                did = true;
+                    did = true;
                 return false;
             }
             return true;
@@ -121,7 +121,6 @@ GroupReader.Pager = {
             setTimeout(function(){appendItem(itemElem);}, 0);
             return itemElem;
         },
-        pagerTimer: null,
         updatePager: function() {
             clearTimeout(GroupReader.pagerTimer);
             GroupReader.pagerTimer = setTimeout(function(){
