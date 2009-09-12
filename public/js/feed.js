@@ -40,7 +40,7 @@
         var header = $("<div>").addClass("item-header");
         header.append($("<a>").attr("href", item.link).text(item.title));
 
-        if (item.title != item.description && item.title != $(item.description).text) {
+        if (item.description.length > 0 && item.title != item.description && item.title != $(item.description).text) {
             var body = $("<div>").addClass("item-body");
             body.append($(item.description).length ? $(item.description) : document.createTextNode(item.description));
         } else {
