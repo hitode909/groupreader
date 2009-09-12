@@ -1,0 +1,3 @@
+[submodule "modules/ambtime"]
+	path = modules/ambtime
+	url = git://gist.github.com/120040.git
