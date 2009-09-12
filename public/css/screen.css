@@ -154,3 +154,15 @@ div.item .header-info li {
 .feed-item:hover .delete-button {
   display: inline;
 }
+
+.more-button {
+    font-weight: bold;
+    font-size: 2em;
+    padding: 5px;
+    cursor: pointer;
+    background: #eee;
+  border-color:#aaa;
+  border-style:solid;
+  border-width: 0 0 1px;
+  text-align: center;
+}

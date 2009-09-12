@@ -1,3 +1,11 @@
+if (typeof(GroupReader) == "undefined") {
+    GroupReader = {};
+}
+GroupReader.Pager = {
+    page: 1,
+    perpage: 20
+};
+
 (function() {
     var feedElement = function(feed) {
         var elem = $("<div>").addClass("feed-item");
@@ -35,7 +43,7 @@
     };
 
     var itemElement = function(feed, item) {
-        var element = $("<div>").addClass("item");
+        var element = $("<div>").attr("style", "display: none").addClass("item");
         if (item.pubDate) element.data('date', Date.parse(item.pubDate));
         var header = $("<div>").addClass("item-header");
         header.append($("<a>").addClass("title-link").attr("href", item.link).text(item.title));
@@ -110,8 +118,33 @@
             if (!itemTarget) itemTarget = $(".items");
 
             var itemElem = itemElement(feed, item);
-            appendItem(itemElem);
+            setTimeout(function(){appendItem(itemElem);}, 0);
             return itemElem;
+        },
+        pagerTimer: null,
+        updatePager: function() {
+            clearTimeout(GroupReader.pagerTimer);
+            GroupReader.pagerTimer = setTimeout(function(){
+                var length = GroupReader.Pager.page * GroupReader.Pager.perpage;
+                $('.item:gt(' + length + ')').hide();
+                $('.item:lt(' + length + ')').show();
+                if ($('.more-button').length == 0 && $('.item').length > length) {
+                    $.appendMoreButton();
+                } else if($('.more-button').length > 0 && $('.item').length <= length) {
+                    $.removeMoreButton();
+                }
+            }, 100);
+        },
+        appendMoreButton: function() {
+            var btn = $('<div>').text('more').addClass('more-button');
+            btn.click(function() {
+                GroupReader.Pager.page++;
+                $.updatePager();
+            });
+            $('.navigation-bottom').append(btn);
+        },
+        removeMoreButton: function() {
+            $('.more-button').remove();
         }
     });
 })(jQuery);
@@ -157,5 +190,9 @@ $(document).ready(function(){
         $(data.feeds).each(function() {
             $.newfeed(this);
         });
+    });
+
+    $('.items').bind("DOMSubtreeModified",function() {
+        $.updatePager();
     });
 });
