@@ -1,86 +1,51 @@
 module Api
   class GroupController < JsonController
     before_all do
-      group_name = url_decode request[:name]
-      group = Group.find(:name => group_name)
-      if group
-        group.uniq_feeds
-      end
+      @name = url_decode request[:name]
+      @uri   = url_decode request[:uri]
+      @group      = Group.find(:name => @name)
+      @feed       = Feed.find(:uri => @uri)
     end
 
     def index
-      name = request[:name]
-      group = Group.find(:name => name)
-      respond('group not found', 404) unless group
-      group.to_hash
+      respond('group not found', 404) unless @group
+      @group.uniq_feeds
     end
 
-=begin
-    def create
-      return unless request.post?
-      name = request[:name]
-      respond('The group already exist.', 409) if Group.find(:name => name)
-      group = Group.create(:name => name)
-      group.save.to_hash
-    end
-
-    def delete
-      return unless request.post?
-      name = request[:name]
-      group = Group.find(:name => name)
-      respond('The group not found', 404) unless group
-      group.destroy
-      'ok'
-    end
-=end
     def subscribe
       return unless request.post?
-      group_name = url_decode request[:name]
-      uri = url_decode request[:uri]
-      return unless uri.length
-      uris = uri.split(',')
-      group = Group.find_or_create(:name => group_name).save
+      return unless @uri.length
+      uris = @uri.split(',')
+      @group ||= Group.create(:name => @name)
       feeds = uris.map{|u| Feed.find_feeds(u.strip)}.flatten.compact
       feeds.each do |feed|
         begin
-          group.add_feed(feed)
+          @group.add_feed(feed)
         rescue
         else
-          Activity.subscribe(group, feed)
+          Activity.subscribe(@group, feed)
         end
       end
-      group.to_hash
+      @group.uniq_feeds
     end
 
     def unsubscribe
       return unless request.post?
-      group_name = url_decode request[:name]
-      feed_uri = url_decode request[:feed_uri]
-      feed = Feed.find(:uri => feed_uri)
-      group = Group.find(:name => group_name)
-      respond('The group not found', 404) unless group
+      respond('The group not found', 404) unless @group
+      respond('The feed not found', 404) unless @feed
       begin
-        group.remove_feed(feed)
+        @group.remove_feed(@feed)
       rescue
       else
-        Activity.unsubscribe(group, feed)
+        Activity.unsubscribe(@group, @feed)
       end
-      group.to_hash
+      @group.uniq_feeds
     end
-
-=begin
-    def activities
-      group_name = url_decode request[:name]
-      group = Group.find(:name => group_name)
-      respond('The group not found', 404) unless group
-      group.activities.map(&:to_hash)
-    end
-=end
   end
 
   class FeedController < JsonController
     def index
-      Feed.find(:uri => url_decode(url_decode(request[:uri]))).to_hash
+      Feed.find(:uri => url_decode(url_decode(request[:uri])))
     rescue
       respond('not found', 404)
     end

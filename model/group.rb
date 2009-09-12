@@ -33,23 +33,25 @@ class Group < Sequel::Model
   end
 
   def uniq_feeds
+    self.refresh
     test_block = lambda{ |hash|
       hash['items'].map{|item| item['link']}
     }
     self.feeds.combination(2).each do |a, b|
-      next unless a and b
+      next unless a and b or a == b
       ah = a.cached_hash
       bh = b.cached_hash
+
       if ah and bh and
           test_block.call(ah) == test_block.call(bh)
         Ramaze::Log.debug "auto delete"
         Ramaze::Log.debug [ah['uri'], bh['uri']]
-        Ramaze::Log.debug [test_block.call(ah), test_block.call(bh)]
-        Ramaze::Log.debug ah['uri'].length < bh['uri'].length ? a.uri : b.uri
         self.remove_feed(ah['uri'].length < bh['uri'].length ? a : b)
         self.save
+        retry
       end
     end
+    self
   end
 
   create_table unless table_exists?

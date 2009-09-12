@@ -20,7 +20,7 @@ GroupReader.Feeds = [];
         removeButton.click(function(){
             elem.append(loadingElement());
             $.post('/api/group/unsubscribe',
-                   { feed_uri: feed.uri,
+                   { uri: feed.uri,
                      name: GroupReader.group
                    },
                    function(group){
