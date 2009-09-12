@@ -7,7 +7,7 @@ class Controller < Ramaze::Controller
 end
 
 class JsonController < Controller
-  provide(:html, :type => 'application/json'){|a,s| s.to_json }
+  provide(:html, :type => 'application/json'){|a,s| s.to_hash.to_json }
 end
 
 require 'controller/main'

@@ -1,5 +1,13 @@
 module Api
   class GroupController < JsonController
+    before_all do
+      group_name = url_decode request[:name]
+      group = Group.find(:name => group_name)
+      if group
+        group.uniq_feeds
+      end
+    end
+
     def index
       name = request[:name]
       group = Group.find(:name => name)

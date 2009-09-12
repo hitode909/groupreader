@@ -67,6 +67,16 @@ class Feed < Sequel::Model
     result
   end
 
+  def cached_hash
+    source = self.cached_source
+    return unless source
+    self.class.parse_feed(self, source)
+  end
+
+  def cached_source
+    ExternalResource.try_get(self.uri)
+  end
+
   def to_hash
     source = ExternalResource.try_get(self.uri)
     source ? self.class.parse_feed(self, source) :

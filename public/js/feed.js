@@ -46,16 +46,21 @@ GroupReader.Feeds = [];
         var element = $("<div>").attr("style", "display: none").addClass("item");
         if (item.pubDate) element.data('date', Date.parse(item.pubDate));
         var header = $("<div>").addClass("item-header");
-        header.append($("<a>").addClass("title-link").attr("href", item.link).text(item.title));
+        header.append($("<a>").addClass("title-link").attr("href", item.link).text($.unescapeHTML(item.title)));
         var menu = $("<ul>").addClass("header-info");
-        if (feed.link || feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link || feed.uri}).addClass('source').append($("<img>").attr("src", feed.favicon)).append(document.createTextNode(feed.title))));
+        if (feed.link || feed.uri)     menu.append($("<li>").append($("<a>").attr({target: "_blank", href: feed.link || feed.uri}).addClass('source').append($("<img>").attr("src", feed.favicon)).append(document.createTextNode($.unescapeHTML(feed.title)))));
         if (item.pubDate) menu.append($("<li>").text(ambtime(new Date(item.pubDate))));
         if (item.creator) menu.append($("<li>").text('by ' + item.creator));
         header.append(menu);
-        
-        if (item.description.length > 0 && item.title != item.description && item.title != $(item.description).text) {
-            var body = $("<div>").addClass("item-body");
-            body.append($(item.description).length ? $(item.description) : document.createTextNode(item.description));
+
+        if (item.description.length > 0) {
+            var body = $("<div>");
+            body.html(item.description);
+            if (body.text() != $.unescapeHTML(item.title)) {
+                body.addClass("item-body");
+            } else {
+                body = null;
+            }
         } else {
             var body = false;
         }
@@ -67,6 +72,11 @@ GroupReader.Feeds = [];
 
 
     jQuery.extend({
+        unescapeHTML: function(text) {
+            var div = document.createElement('div');
+            div.innerHTML = text;
+            return div.childNodes[0] ? div.childNodes[0].nodeValue : '';
+        },
         newfeed: function(feed, feedTarget, itemTarget){
             if (!feed.uri) return false;
             if (!feedTarget) feedTarget = $(".feed-list");
