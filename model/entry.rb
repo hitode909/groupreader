@@ -8,7 +8,7 @@ class Entry < Sequel::Model
     primary_key :id
     String :uri, :unique => true, :null => false
     String :title
-    String :description
+    String :description, :text=>true
     String :creator
     Boolean :valid, :default => true
     foreign_key :feed_id
