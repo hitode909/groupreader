@@ -14,11 +14,13 @@ require 'model/init'
 group = Group.find_or_create(:name => 'scraper')
 
 feeds = ARGV.map{|u|
-  puts "fetching feed: #{u.strip}"
+  puts "subscribing feed: #{u.strip}"
   Feed.find_feeds(u.strip)
 }.flatten.compact
+
 feeds.each do |feed|
   begin
+    puts "parsing feed #{feed.uri}"
     group.add_feed(feed)
   rescue => e
     p e
@@ -27,6 +29,7 @@ feeds.each do |feed|
     Activity.subscribe(group, feed)
   end
 end
-puts "done"
+puts "subscribe done"
+puts "fetching feeds"
 puts "group: " + group.name
 puts group.feeds.map(&:uri)
