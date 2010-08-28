@@ -22,10 +22,10 @@ feeds.each do |feed|
   begin
     puts "parsing feed #{feed.uri}"
     group.add_feed(feed)
+    feed.read
   rescue => e
     p e
   else
-    p [group, feed]
     Activity.subscribe(group, feed)
   end
 end

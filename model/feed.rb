@@ -68,7 +68,8 @@ class Feed < Sequel::Model
           :creator => item.dc_creator,
           :description => Sanitize.clean((item.content_encoded || item.description),
             Sanitize::Config::RELAXED),
-          :uri => item.link
+          :uri => item.link,
+          :feed_id => feed.id
           )
       end
       entry.as_hash
