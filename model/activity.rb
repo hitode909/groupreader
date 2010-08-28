@@ -20,12 +20,12 @@ class Activity < Sequel::Model
   end
 
   def self.subscribe(group, feed)
-    Ramaze::Log.debug "subscribed(#{group.name}, #{feed.title})"
+    Ramaze::Log.debug "subscribed(#{group.name}, #{feed.title})" if defined? Ramaze
     self.create :group => group , :feed => feed, :operation => 'subscribe'
   end
 
   def self.unsubscribe(group, feed)
-    Ramaze::Log.debug "unsubscribed(#{group.name}, #{feed.title})"
+    Ramaze::Log.debug "unsubscribed(#{group.name}, #{feed.title})" if defined? Ramaze
     self.create :group => group , :feed => feed, :operation => 'unsubscribe'
   end
 

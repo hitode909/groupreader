@@ -44,8 +44,8 @@ class Group < Sequel::Model
 
       if ah and bh and
           test_block.call(ah) == test_block.call(bh)
-        Ramaze::Log.debug "auto delete"
-        Ramaze::Log.debug [ah['uri'], bh['uri']]
+        Ramaze::Log.debug "auto delete" if defined? Ramaze
+        Ramaze::Log.debug [ah['uri'], bh['uri']] if defined? Ramaze
         self.remove_feed(ah['uri'].length < bh['uri'].length ? a : b)
         self.save
         retry
