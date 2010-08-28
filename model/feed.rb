@@ -13,7 +13,9 @@ class Feed < Sequel::Model
     time :created_at
     time :modified_at
   end
+
   many_to_one :blog
+  one_to_many :entries
 
   def self.find_feeds(uri)
     if Feed.find(:uri => uri)
@@ -30,6 +32,10 @@ class Feed < Sequel::Model
     else
       [Feed.create(:uri => uri)]
     end
+  end
+
+  def read
+    self.class.get(self.uri)
   end
 
   def self.get(feed_uri)
@@ -54,14 +60,18 @@ class Feed < Sequel::Model
     result['creator'] = rss.channel.dc_creator
     result['description'] = rss.channel.description
     result['items'] = rss.items.map do |item|
-      {
-        'title' => item.title,
-        'pubDate' => (item.dc_date || item.pubDate).rfc822,
-        'creator' => item.dc_creator,
-        'description' => Sanitize.clean((item.content_encoded || item.description),
-          Sanitize::Config::RELAXED),
-        'link' => item.link,
-      }
+      entry = Entry.find(:uri => item.link)
+      unless entry
+        entry = Entry.create(
+          :title => item.title,
+          :pub_date => (item.dc_date || item.pubDate).rfc822,
+          :creator => item.dc_creator,
+          :description => Sanitize.clean((item.content_encoded || item.description),
+            Sanitize::Config::RELAXED),
+          :uri => item.link
+          )
+      end
+      entry.as_hash
     end
 
     result
@@ -78,8 +88,8 @@ class Feed < Sequel::Model
   end
 
   def to_hash
-#     source = ExternalResource.try_get(self.uri)
-#     source ? self.class.parse_feed(self, source) :
+    #     source = ExternalResource.try_get(self.uri)
+    #     source ? self.class.parse_feed(self, source) :
     { :title    => self.title,
       :uri     => self.uri,
       :favicon => self.blog.favicon,
